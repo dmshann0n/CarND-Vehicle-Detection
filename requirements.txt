@@ -2,3 +2,6 @@ clize==4.0.1
 opencv-python
 matplotlib
 moviepy
+progressbar2
+scikit-image
+sklearn
