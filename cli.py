@@ -8,7 +8,7 @@ import cv2
 from moviepy.editor import VideoFileClip
 
 from lane_finder import camera_calibration, plotter, lane_finder
-from vehicle_detection import classifier
+from vehicle_detection import classifier, image, detector
 
 PLOT = plotter.Plotter(False)
 INIT = False
@@ -66,7 +66,7 @@ def lane_line_single_image(img_path=None, show_plots=False):
     calibrator = _config_camera_calibrator(show_plots)
     finder = lane_finder.LaneFinder(calibrator, get_plotter(show_plots))
 
-    img = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB)
+    img = image.load_img(img_path)
     finder.find_lanes(img)
 
 def vehicle_detect_data_summary():
@@ -84,6 +84,21 @@ def vehicle_detect_train(path=None):
     clf.to_pickle(path)
 
     log.info(f'Saved classifier to {path}')
+
+def vehicle_search_single_image(img_path=None):
+    if not img_path:
+        img_path = 'test_images/test1.jpg'
+
+    init_logging()
+
+    clf = classifier.Classifier()
+    clf.from_pickle(VEHICLE_DETECTION_CLASSIFIER_PATH)
+
+    detect = detector.Detector(clf)
+
+    img = image.load_img(img_path)
+    detect.draw_bounds(img)
+
 
 def full_run(video_path=None, show_plots=False):
     if not video_path:
@@ -108,4 +123,6 @@ if __name__ == '__main__':
         pickle_camera_calibration,
         lane_line_single_image,
         vehicle_detect_data_summary,
-        vehicle_detect_train)
+        vehicle_detect_train,
+        vehicle_search_single_image,
+    )
