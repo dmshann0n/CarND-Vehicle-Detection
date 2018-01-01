@@ -85,9 +85,9 @@ def vehicle_detect_train(path=None):
 
     log.info(f'Saved classifier to {path}')
 
-def vehicle_search_single_image(img_path=None):
+def vehicle_detect_single_image(img_path=None):
     if not img_path:
-        img_path = 'test_images/test1.jpg'
+        img_path = 'test_images/test3.jpg'
 
     init_logging()
 
@@ -124,5 +124,5 @@ if __name__ == '__main__':
         lane_line_single_image,
         vehicle_detect_data_summary,
         vehicle_detect_train,
-        vehicle_search_single_image,
+        vehicle_detect_single_image,
     )
