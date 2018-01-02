@@ -25,7 +25,7 @@ class Heatmap:
             for window in frame:
                 heatmap[window[0][1]:window[1][1], window[0][0]:window[1][0]] += 1
 
-        heatmap[heatmap < min(len(self.frames) * 2, self.threshold)] = 0
+        heatmap[heatmap < min(len(self.frames) * 3, self.threshold)] = 0
 
         return heatmap
 
