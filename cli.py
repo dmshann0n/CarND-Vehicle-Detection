@@ -87,7 +87,7 @@ def vehicle_detect_train(path=None):
 
 def vehicle_detect_single_image(img_path=None):
     if not img_path:
-        img_path = 'test_images/test3.jpg'
+        img_path = 'test_images/test1.jpg'
 
     init_logging()
 
@@ -97,7 +97,28 @@ def vehicle_detect_single_image(img_path=None):
     detect = detector.Detector(clf)
 
     img = image.load_img(img_path)
-    detect.draw_bounds(img)
+    output = detect.identify_vehicles(img)
+
+    plotter.Plotter(True).plot_images(output)
+
+def vehicle_detect_full_run(video_path=None):
+    if not video_path:
+        video_path = 'project_video.mp4'
+
+    init_logging()
+
+    clf = classifier.Classifier()
+    clf.from_pickle(VEHICLE_DETECTION_CLASSIFIER_PATH)
+
+    detect = detector.Detector(clf)
+
+    log.debug(f'Processing video {video_path}')
+    clip = VideoFileClip(video_path)
+    updated = clip.fl_image(detect.identify_vehicles)
+
+    split_path = video_path.split('.')
+    new_file = "".join([split_path[0], '_output.', split_path[1]])
+    updated.write_videofile(new_file, audio=False)
 
 
 def full_run(video_path=None, show_plots=False):
@@ -125,4 +146,5 @@ if __name__ == '__main__':
         vehicle_detect_data_summary,
         vehicle_detect_train,
         vehicle_detect_single_image,
+        vehicle_detect_full_run,
     )

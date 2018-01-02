@@ -1,35 +1,39 @@
+import logging as log
+
 import cv2
 import numpy as np
 from skimage.feature import hog
 
 from vehicle_detection.image import convert_color
 
-COLOR_SPACE = 'RGB'
+COLOR_SPACE = 'HLS'
 SPATIAL_SIZE = (32, 32)
 HIST_BINS = 32
 BINS_RANGE = (0, 256)
-ORIENTATIONS = 9
+ORIENTATIONS = 11
 PIX_PER_CELL = 8
-CELLS_PER_BLOCK = 2
-HOG_CHANNEL = None
 
+CELLS_PER_BLOCK = 2
+
+HOG_CHANNEL = [0, 1, 2]
+COLOR_HISTOGRAM_CHANNELS = [0, 1, 2]
 
 def hog_features_all(img):
     features = []
-    for channel in range(img.shape[2]):
+    for channel in HOG_CHANNEL:
         features.append(hog_features_by_channel(img, channel))
 
     return np.ravel(features)
 
+def hog_features_by_channel(img, channel, feature_vector=True):
 
-def hog_features_by_channel(img, channel=0):
     return hog(
         img[:, :, channel],
         orientations=ORIENTATIONS,
         pixels_per_cell=(PIX_PER_CELL, PIX_PER_CELL),
         cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK),
         transform_sqrt=True,
-        feature_vector=True,
+        feature_vector=feature_vector,
         block_norm='L2-Hys',
     )
 
@@ -38,7 +42,7 @@ def spatial_features(img):
 
 def color_histogram_features(img):
     histograms = []
-    for channel in [0, 1, 2]:
+    for channel in COLOR_HISTOGRAM_CHANNELS:
         histograms.append(np.histogram(
             img[:, :, channel],
             bins=HIST_BINS,
@@ -47,16 +51,14 @@ def color_histogram_features(img):
 
     return np.concatenate(histograms)
 
-FEATURE_STRATEGIES = [
-    hog_features_all,
-    spatial_features,
-    color_histogram_features
-]
 
 def to_features(img):
     img = convert_color(img, COLOR_SPACE)
 
     features = []
-    for strategy in FEATURE_STRATEGIES:
-        features.append(strategy(img))
+
+    features.append(hog_features_all(img))
+    features.append(spatial_features(img))
+    features.append(color_histogram_features(img))
+
     return np.concatenate(features)

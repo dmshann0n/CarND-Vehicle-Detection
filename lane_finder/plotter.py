@@ -17,9 +17,13 @@ class Plotter():
         plt.plot(data)
         plt.show()
 
-    def plot_images(self, *imgs):
+    def plot_images(self, *imgs, **kwargs):
         if not self.show_plots:
             return
+
+        cmap = None
+        if 'cmap' in kwargs:
+            cmap = kwargs['cmap']
 
         f, axes = plt.subplots(len(imgs), 1, figsize=(WIDTH, HEIGHT * len(imgs)))
         f.tight_layout()
@@ -31,8 +35,8 @@ class Plotter():
 
         for i, img in enumerate(imgs):
             if callable(img):
-                axes[i].imshow(img())
+                axes[i].imshow(img(), cmap=cmap)
             else:
-                axes[i].imshow(img)
+                axes[i].imshow(img, cmap=cmap)
 
         plt.show()

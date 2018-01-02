@@ -22,7 +22,6 @@ def dir_to_array(path):
 class Classifier:
 
     DEFAULT_DATA_PATH = 'data'
-    BATCH_SIZE = 500
 
     CAR_SET = [
         'vehicles/GTI_Far',
