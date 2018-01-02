@@ -93,9 +93,8 @@ Ultimately I searched on three scales using HLS 3-channel HOG features plus spat
 
 Here are some example images:
 
-![alt text][image4]![alt text][image5]
-![alt text][image5]![alt text][image6]
-![alt text][image7]![alt text][image8]
+![alt text][image4]
+![alt text][image5]
 
 ### Video Implementation
 
