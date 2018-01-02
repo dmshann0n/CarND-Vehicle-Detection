@@ -29,6 +29,24 @@ The goals / steps of this project are the following:
 
 ---
 
+To start this project, I merged the structure of the Lane Finding project. Similar to my implementation there, I started adding to a cli implemented with clize.
+
+```
+./cli.py --help
+Usage: ./cli.py command [args...]
+
+Commands:
+  full-run
+  test-calibrate-camera
+  pickle-camera-calibration
+  lane-line-single-image
+  vehicle-detect-data-summary
+  vehicle-detect-train
+  vehicle-detect-single-image
+  vehicle-detect-full-run
+  vehicle-detect-hog-sample
+```
+
 ### Histogram of Oriented Gradients (HOG)
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
@@ -41,14 +59,14 @@ HOG features are extracted in `vehicle_detection/features.py`. The function `hog
 
 I explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+Here is an example using the `HLS` color space and HOG parameters of `orientations=11`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
 
 ![alt text][image2]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various parameters with the intention of maximizing the test accuracy from the `LinearSVC` classifier.
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 

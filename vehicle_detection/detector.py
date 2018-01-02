@@ -7,6 +7,28 @@ from scipy.ndimage.measurements import label
 from lane_finder import plotter
 from vehicle_detection.features import to_features, SPATIAL_SIZE
 
+class Heatmap:
+    def __init__(self, length, threshold):
+        self.frames = []
+        self.max_length = length
+        self.threshold = threshold
+
+    def add_frame(self, windows):
+        self.frames.append(windows)
+        if len(self.frames) > self.max_length:
+            self.frames.pop(0)
+
+    def get_heatmap(self, img):
+        heatmap = np.zeros_like(img[:, :, 0]).astype(np.float)
+
+        for frame in self.frames:
+            for window in frame:
+                heatmap[window[0][1]:window[1][1], window[0][0]:window[1][0]] += 1
+
+        heatmap[heatmap <= self.threshold] = 0
+        return heatmap
+
+
 class Detector:
 
     WINDOW_SIZES = [64, 96, 128]
@@ -16,23 +38,17 @@ class Detector:
     Y_OVERLAP = [16, 48, 64]
 
     HEATMAP_THRESHOLD = 3
-    HEATMAP_DECAY_DELAY = 5
     HEATMAP_DECAY = 1
 
 
     def __init__(self, classifier, show_predicted=False):
         self.classifier = classifier
-
-        self.heatmap = None
-        self.frames = 0
-
+        self.heatmap = Heatmap(25, 25)
         self.show_predicted = show_predicted
 
     def identify_vehicles(self, img, output_img=None):
         if not output_img:
             output_img = img.copy()
-
-        self._ensure_heatmap_initialized(img)
 
         vehicle_windows = []
 
@@ -58,7 +74,7 @@ class Detector:
 
         self._add_frame(vehicle_windows)
 
-        for bounds in self._get_estimated_positions():
+        for bounds in self._get_estimated_positions(img):
             cv2.rectangle(
                 output_img,
                 bounds[0],
@@ -68,29 +84,15 @@ class Detector:
 
         return output_img
 
-    def _ensure_heatmap_initialized(self, img):
-        if self.heatmap is not None:
-            return
-
-        self.heatmap = np.zeros_like(img[:, :, 0]).astype(np.float)
-
     def _add_frame(self, vehicle_windows):
-        self.frames += 1
+        self.heatmap.add_frame(vehicle_windows)
 
-        for window in vehicle_windows:
-            self.heatmap[window[0][1]:window[1][1], window[0][0]:window[1][0]] += 1
+    def _get_estimated_positions(self, img):
 
-        if self.frames > self.HEATMAP_DECAY_DELAY:
-            self.heatmap[self.heatmap > self.HEATMAP_THRESHOLD] -= self.HEATMAP_DECAY
-
-    def _get_estimated_positions(self):
-        thresholded_heatmap = self.heatmap.copy()
-        thresholded_heatmap[thresholded_heatmap <= self.HEATMAP_THRESHOLD] = 0
-
-        #plotter.Plotter(True).plot_images(thresholded_heatmap)
+        heatmap = self.heatmap.get_heatmap(img)
 
         found = []
-        positions, num_objects = label(thresholded_heatmap)
+        positions, num_objects = label(heatmap)
 
         for ordinal in range(1, num_objects + 1):
             nonzero_y, nonzero_x = (positions == ordinal).nonzero()
