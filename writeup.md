@@ -20,12 +20,15 @@ The goals / steps of this project are the following:
 [image3]: ./examples/labels_map.png
 [image4]: ./examples/test1_example_bb.jpg
 [image5]: ./examples/test1_example_heatmap.jpg
-[image6]: ./examples/test2_example_bb.jpg
-[image7]: ./examples/test2_example_heatmap.jpg
-[image8]: ./examples/test4_example_bb.jpg
-[image9]: ./examples/test4_example_heatmap.jpg
 [image10]: ./examples/sliding_windows.jpg
 [image11]: ./examples/HOG_example.jpg
+[frame1]: ./examples/frame1.png
+[frame2]: ./examples/frame2.png
+[frame3]: ./examples/frame3.png
+[frame4]: ./examples/frame4.png
+[frame5]: ./examples/frame5.png
+[frame6]: ./examples/frame6.png
+[last_f]: ./examples/last_frame.png
 
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
@@ -110,17 +113,17 @@ This code is located in `vehicle_detection/detector.py` in the `_get_estimated_p
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
-### Here are six frames and their corresponding heatmaps:
+### Here are six frames, their corresponding heatmaps, and the output of `scipy.ndimage.measurements.label()`:
 
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
+![alt text][frame1]
+![alt text][frame2]
+![alt text][frame3]
+![alt text][frame4]
+![alt text][frame5]
+![alt text][frame6]
 
 ### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
-
+![alt text][last_f]
 
 ---
 
