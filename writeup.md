@@ -91,7 +91,7 @@ Here's an example of the sliding image search with the detected vehicles:
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on three scales using HLS 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result. After the pipeline was roughly working from a vehicle identification standpoint I worked to remove false positives by tweaking the heatmap to be less permissive. As this evolved, the heatmap came to store all window history for the past N frames (40 in this version), and a threshold of 30 was required for the heatmap to identify a vehicle. 
+Ultimately I searched on three scales using `YCrCb` 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result. After the pipeline was roughly working from a vehicle identification standpoint I worked to remove false positives by tweaking the heatmap to be less permissive. As this evolved, the heatmap came to store all window history for the past N frames (40 in this version), and a threshold of 30 was required for the heatmap to identify a vehicle.
 
 Here are some example images:
 
@@ -106,7 +106,7 @@ Here's a [link to my video result](./project_video_output.mp4)
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.
+I recorded the positions of positive detections in each frame of the video and stored these positive windows in an instance of `Heatmap`.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.
 
 This code is located in `vehicle_detection/detector.py` in the `Detector._get_estimated_positions` method.
 
@@ -132,7 +132,7 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 * Performance is a big issue! :( I worked on calling `skimage.hog()` once per frame, but it would have required modifications to the rest of my code that I needed to plan out more. Selecting cells from the results didn't match the way I had already built the sliding window.
 
-* There's still a fair number of false positives. I read up on hard negative mining and given more time would explore that.
+* There's still a fair number of false positives, especially on the center divider and left shoulder. I read up on hard negative mining and given more time would explore that.
 
 * I'd love to explore integrating the Udacity datasets (and other datasets!) to create more powerful detection.
 

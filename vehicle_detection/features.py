@@ -6,7 +6,7 @@ from skimage.feature import hog
 
 from vehicle_detection.image import convert_color
 
-COLOR_SPACE = 'HLS'
+COLOR_SPACE = 'YCrCb'
 SPATIAL_SIZE = (32, 32)
 HIST_BINS = 32
 BINS_RANGE = (0, 256)
