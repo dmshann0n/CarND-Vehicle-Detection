@@ -18,12 +18,12 @@ The goals / steps of this project are the following:
 [image1]: ./examples/car_not_car.png
 [image2]: ./examples/output_bboxes.png
 [image3]: ./examples/labels_map.png
-[image4]: ./examples/test4_example_bb.jpg
-[image5]: ./examples/test4_example_heatmap.jpg
+[image4]: ./examples/test1_example_bb.jpg
+[image5]: ./examples/test1_example_heatmap.jpg
 [image6]: ./examples/test2_example_bb.jpg
 [image7]: ./examples/test2_example_heatmap.jpg
-[image8]: ./examples/test1_example_heatmap.jpg
-[image9]: ./examples/test1_example_bb.jpg
+[image8]: ./examples/test4_example_bb.jpg
+[image9]: ./examples/test4_example_heatmap.jpg
 [image10]: ./examples/sliding_windows.jpg
 [image11]: ./examples/HOG_example.jpg
 
@@ -65,7 +65,6 @@ I explored different color spaces and different `skimage.hog()` parameters (`ori
 
 Here is an example using the `HLS` color space and HOG parameters of `orientations=11`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
-
 ![alt text][image11]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
@@ -84,14 +83,19 @@ I tried multiple approaches, ranging from very little overlap to additional over
 
 In my original implementation, each window size also walked the frame starting at the halfway point (`MIN_Y` in `vehicle_detection/detector.py`) of the image. In this final implementation, each size only slides at a fixed Y coordinate.
 
-![alt text][image3]
+Here's an example of the sliding image search with the detected vehicles:
+
+![alt text][image10]
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on three scales using HLS 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Ultimately I searched on three scales using HLS 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result. After the pipeline was roughly working from a vehicle identification standpoint I worked to remove false positives by tweaking the heatmap to be less permissive. As this evolved, the heatmap came to store all window history for the past N frames (40 in this version), and a threshold of 30 was required for the heatmap to identify a vehicle. 
 
-![alt text][image4]
----
+Here are some example images:
+
+![alt text][image4]![alt text][image5]
+![alt text][image5]![alt text][image6]
+![alt text][image7]![alt text][image8]
 
 ### Video Implementation
 
