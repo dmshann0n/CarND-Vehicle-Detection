@@ -132,7 +132,7 @@ def vehicle_detect_single_image(img_path=None):
 
 def vehicle_detect_full_run(video_path=None):
     if not video_path:
-        video_path = 'project_video.mp4'
+        video_path = 'test_video.mp4'
 
     init_logging()
 

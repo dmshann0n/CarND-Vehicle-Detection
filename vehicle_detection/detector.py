@@ -25,7 +25,8 @@ class Heatmap:
             for window in frame:
                 heatmap[window[0][1]:window[1][1], window[0][0]:window[1][0]] += 1
 
-        heatmap[heatmap <= self.threshold] = 0
+        heatmap[heatmap < min(len(self.frames) * 2, self.threshold)] = 0
+
         return heatmap
 
 
@@ -35,15 +36,11 @@ class Detector:
     MIN_Y = 390
 
     X_OVERLAP = 16
-    Y_OVERLAP = [16, 48, 64]
-
-    HEATMAP_THRESHOLD = 3
-    HEATMAP_DECAY = 1
-
+    Y_OVERLAP = [32, 48, 64]
 
     def __init__(self, classifier, show_predicted=False):
         self.classifier = classifier
-        self.heatmap = Heatmap(25, 25)
+        self.heatmap = Heatmap(40, 30)
         self.show_predicted = show_predicted
 
     def identify_vehicles(self, img, output_img=None):
@@ -93,6 +90,8 @@ class Detector:
 
         found = []
         positions, num_objects = label(heatmap)
+
+        #plotter.Plotter(True).plot_three(img, heatmap, positions, [None, 'hot', None])
 
         for ordinal in range(1, num_objects + 1):
             nonzero_y, nonzero_x = (positions == ordinal).nonzero()

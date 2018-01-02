@@ -4,7 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-WIDTH = HEIGHT = 3
+WIDTH = HEIGHT = 5
 
 class Plotter():
     def __init__(self, show_plots):
@@ -15,6 +15,19 @@ class Plotter():
             return
 
         plt.plot(data)
+        plt.show()
+
+    def plot_pair(self, img0, img1, cmaps):
+        f, axes = plt.subplots(1, 2, figsize=(WIDTH * 2, HEIGHT))
+        axes[0].imshow(img0, cmap=cmaps[0])
+        axes[1].imshow(img1, cmap=cmaps[1])
+        plt.show()
+
+    def plot_three(self, img0, img1, img2, cmaps):
+        f, axes = plt.subplots(1, 3, figsize=(WIDTH * 3, HEIGHT))
+        axes[0].imshow(img0, cmap=cmaps[0])
+        axes[1].imshow(img1, cmap=cmaps[1])
+        axes[2].imshow(img2, cmap=cmaps[2])
         plt.show()
 
     def plot_images(self, *imgs, **kwargs):
