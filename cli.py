@@ -125,7 +125,12 @@ def vehicle_detect_single_image(img_path=None):
     detect = detector.Detector(clf)
 
     img = image.load_img(img_path)
-    output = detect.identify_vehicles(img)
+
+    calibrator = camera_calibration.CameraCalibration(get_plotter())
+    calibrator.config()
+
+    undisorted = calibrator.undistort(img)
+    output = detect.identify_vehicles(undisorted)
 
     plotter.Plotter(True).plot_images(output)
 
@@ -141,13 +146,20 @@ def vehicle_detect_full_run(video_path=None):
 
     detect = detector.Detector(clf)
 
+    calibrator = camera_calibration.CameraCalibration(get_plotter())
+
     log.debug(f'Processing video {video_path}')
     clip = VideoFileClip(video_path)
-    updated = clip.fl_image(detect.identify_vehicles)
+    updated = clip.fl_image(lambda img: _vehicle_detect_full_run_wrapper(img, detect, calibrator))
 
     split_path = video_path.split('.')
     new_file = "".join([split_path[0], '_output.', split_path[1]])
     updated.write_videofile(new_file, audio=False)
+
+
+def _vehicle_detect_full_run_wrapper(img, detect, calibrator):
+    undistorted = calibrator.undistort(img)
+    return detect.identify_vehicles(undistorted)
 
 
 def full_run(video_path=None, show_plots=False):
@@ -165,16 +177,21 @@ def full_run(video_path=None, show_plots=False):
 
     log.debug(f'Processing video {video_path}')
     clip = VideoFileClip(video_path)
-    updated = clip.fl_image(lambda img: _full_run_wrapper(img, finder, detect))
+    updated = clip.fl_image(lambda img: _full_run_wrapper(img, finder, detect, calibrator))
 
     split_path = video_path.split('.')
     new_file = "".join([split_path[0], '_output.', split_path[1]])
     updated.write_videofile(new_file, audio=False)
 
-def _full_run_wrapper(img, finder, detect):
+
+def _full_run_wrapper(img, finder, detect, calibrator):
     new_img = finder.find_lanes(img)
+
+    # the lane finder outputs an undistorted (and cropped image) so manage that here..
+    undistorrted = calibrator.undistort(img)
     new_img = detect.identify_vehicles(img, output_img=new_img)
     return new_img
+
 
 if __name__ == '__main__':
     run(full_run,

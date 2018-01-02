@@ -32,15 +32,15 @@ class Heatmap:
 
 class Detector:
 
-    WINDOW_SIZES = [64, 96, 128]
-    MIN_Y = 390
-    LEFT_X = 384 # hack!
-    X_OVERLAP = 16
-    Y_OVERLAP = [32, 48, 64]
+    WINDOW_SIZES = [48, 72, 72, 96]
+    MIN_Y = 340
+    LEFT_X = 256 # hack!
+    X_OVERLAP = [16, 36, 48, 48]
+    Y_OVERLAP = [24, 72, 72, 0]
 
-    def __init__(self, classifier, show_predicted=False):
+    def __init__(self, classifier, show_predicted=True):
         self.classifier = classifier
-        self.heatmap = Heatmap(40, 35)
+        self.heatmap = Heatmap(20, 19)
         self.show_predicted = show_predicted
 
     def identify_vehicles(self, img, output_img=None):
@@ -109,7 +109,7 @@ class Detector:
 
         y_position = self.MIN_Y
 
-        for window_size, y_overlap in zip(self.WINDOW_SIZES, self.Y_OVERLAP):
+        for window_size, y_overlap, x_overlap in zip(self.WINDOW_SIZES, self.Y_OVERLAP, self.X_OVERLAP):
             x_position = self.LEFT_X
 
             while x_position < width:
@@ -119,6 +119,6 @@ class Detector:
                     (int(x_position + window_size), int(y_position + window_size)),
                 )
 
-                x_position += self.X_OVERLAP
+                x_position += x_overlap
 
             y_position += y_overlap
