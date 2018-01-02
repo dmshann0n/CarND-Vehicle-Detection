@@ -15,11 +15,12 @@ class Detector:
     X_OVERLAP = 16
     Y_OVERLAP = [16, 48, 64]
 
-    HEATMAP_THRESHOLD = 4
+    HEATMAP_THRESHOLD = 3
+    HEATMAP_DECAY_DELAY = 5
     HEATMAP_DECAY = 1
 
 
-    def __init__(self, classifier, show_predicted=True):
+    def __init__(self, classifier, show_predicted=False):
         self.classifier = classifier
 
         self.heatmap = None
@@ -79,11 +80,14 @@ class Detector:
         for window in vehicle_windows:
             self.heatmap[window[0][1]:window[1][1], window[0][0]:window[1][0]] += 1
 
-        self.heatmap -= self.HEATMAP_DECAY
+        if self.frames > self.HEATMAP_DECAY_DELAY:
+            self.heatmap[self.heatmap > self.HEATMAP_THRESHOLD] -= self.HEATMAP_DECAY
 
     def _get_estimated_positions(self):
         thresholded_heatmap = self.heatmap.copy()
         thresholded_heatmap[thresholded_heatmap <= self.HEATMAP_THRESHOLD] = 0
+
+        #plotter.Plotter(True).plot_images(thresholded_heatmap)
 
         found = []
         positions, num_objects = label(thresholded_heatmap)
