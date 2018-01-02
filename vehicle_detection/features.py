@@ -25,7 +25,7 @@ def hog_features_all(img):
 
     return np.ravel(features)
 
-def hog_features_by_channel(img, channel, feature_vector=True):
+def hog_features_by_channel(img, channel, feature_vector=True, visualise=False):
 
     return hog(
         img[:, :, channel],
@@ -33,6 +33,7 @@ def hog_features_by_channel(img, channel, feature_vector=True):
         pixels_per_cell=(PIX_PER_CELL, PIX_PER_CELL),
         cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK),
         transform_sqrt=True,
+        visualise=visualise,
         feature_vector=feature_vector,
         block_norm='L2-Hys',
     )

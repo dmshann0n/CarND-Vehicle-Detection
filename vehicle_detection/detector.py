@@ -19,7 +19,7 @@ class Detector:
     HEATMAP_DECAY = 1
 
 
-    def __init__(self, classifier, show_predicted=False):
+    def __init__(self, classifier, show_predicted=True):
         self.classifier = classifier
 
         self.heatmap = None
@@ -83,9 +83,7 @@ class Detector:
 
     def _get_estimated_positions(self):
         thresholded_heatmap = self.heatmap.copy()
-        thresholded_heatmap[thresholded_heatmap < self.HEATMAP_THRESHOLD] = 0
-
-        #plotter.Plotter(True).plot_images(np.clip(thresholded_heatmap, 0, 255), cmap='hot')
+        thresholded_heatmap[thresholded_heatmap <= self.HEATMAP_THRESHOLD] = 0
 
         found = []
         positions, num_objects = label(thresholded_heatmap)
