@@ -47,7 +47,7 @@ class Detector:
         self.show_predicted = show_predicted
 
     def identify_vehicles(self, img, output_img=None):
-        if not output_img:
+        if output_img is None:
             output_img = img.copy()
 
         vehicle_windows = []

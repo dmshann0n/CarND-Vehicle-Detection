@@ -16,13 +16,17 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 [image1]: ./examples/car_not_car.png
-[image2]: ./examples/HOG_example.jpg
-[image3]: ./examples/sliding_windows.jpg
-[image4]: ./examples/sliding_window.jpg
-[image5]: ./examples/bboxes_and_heat.png
-[image6]: ./examples/labels_map.png
-[image7]: ./examples/output_bboxes.png
-[video1]: ./project_video.mp4
+[image2]: ./examples/output_bboxes.png
+[image3]: ./examples/labels_map.png
+[image4]: ./examples/test4_example_bb.jpg
+[image5]: ./examples/test4_example_heatmap.jpg
+[image6]: ./examples/test2_example_bb.jpg
+[image7]: ./examples/test2_example_heatmap.jpg
+[image8]: ./examples/test1_example_heatmap.jpg
+[image9]: ./examples/test1_example_bb.jpg
+[image10]: ./examples/sliding_windows.jpg
+[image11]: ./examples/HOG_example.jpg
+
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.
@@ -62,11 +66,11 @@ I explored different color spaces and different `skimage.hog()` parameters (`ori
 Here is an example using the `HLS` color space and HOG parameters of `orientations=11`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
 
-![alt text][image2]
+![alt text][image11]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various parameters with the intention of maximizing the test accuracy from the `LinearSVC` classifier.
+I tried various parameters with the intention of maximizing the test accuracy from the `LinearSVC` classifier. Ultimately I had the best luck in test accuracy and fewest false positives (in this particular sample) when using HLS with accuracy of .9896, 11 orientations, and the original pixels per cell (8x8) and cells per block (2x2).
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
@@ -76,15 +80,15 @@ Because the compilation of features for an image is shared by the classifier and
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I tried multiple approaches and
+I tried multiple approaches, ranging from very little overlap to additional overlap. Too much vertical overlap caused lots of noise in the downstream heatmap. I ultimately settled on 3 fixed sizes of window with increasing overlaps that seemed to work well for me.
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+In my original implementation, each window size also walked the frame starting at the halfway point (`MIN_Y` in `vehicle_detection/detector.py`) of the image. In this final implementation, each size only slides at a fixed Y coordinate.
 
 ![alt text][image3]
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Ultimately I searched on three scales using HLS 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
 ![alt text][image4]
 ---
@@ -98,6 +102,8 @@ Here's a [link to my video result](./project_video_output.mp4)
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
 I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.
+
+This code is located in `vehicle_detection/detector.py` in the `_get_estimated_positions` methods.
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
@@ -119,4 +125,10 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.
+* Performance is a big issue! :( I worked on calling `skimage.hog()` once per frame, but it would have required modifications to the rest of my code that I needed to plan out more. Selecting cells from the results didn't match the way I had already built the sliding window.
+
+* There's still a fair number of false positives. I read up on hard negative mining and given more time would explore that.
+
+* I'd love to explore integrating the Udacity datasets (and other datasets!) to create more powerful detection.
+
+* This was a really fun project!

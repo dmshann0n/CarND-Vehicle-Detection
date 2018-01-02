@@ -159,13 +159,22 @@ def full_run(video_path=None, show_plots=False):
     calibrator = _config_camera_calibrator(show_plots)
     finder = lane_finder.LaneFinder(calibrator, get_plotter(show_plots))
 
+    clf = classifier.Classifier()
+    clf.from_pickle(VEHICLE_DETECTION_CLASSIFIER_PATH)
+    detect = detector.Detector(clf)
+
     log.debug(f'Processing video {video_path}')
     clip = VideoFileClip(video_path)
-    updated = clip.fl_image(finder.find_lanes)
+    updated = clip.fl_image(lambda img: _full_run_wrapper(img, finder, detect))
 
     split_path = video_path.split('.')
     new_file = "".join([split_path[0], '_output.', split_path[1]])
     updated.write_videofile(new_file, audio=False)
+
+def _full_run_wrapper(img, finder, detect):
+    new_img = finder.find_lanes(img)
+    new_img = detect.identify_vehicles(img, output_img=new_img)
+    return new_img
 
 if __name__ == '__main__':
     run(full_run,
